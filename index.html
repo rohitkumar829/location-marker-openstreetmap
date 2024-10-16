@@ -1,1 +1,195 @@
 
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.4/dist/leaflet.css">
+</head>
+
+<body>
+    <div>
+        <div class="mapCreate">
+            <div class="row">
+                <div class="col-md-6">
+                    <div id="map" style="height:500px;width:100%;"></div>
+                </div>
+                <div class="col-md-6">
+                    <button id="getLocationGps">Try It</button>
+                    <div><label for="lat">kilometers</label><input type="text" name="kilometers" id="kilometers" value="0.005"></div>
+                    <div><label for="lat">Latitude</label><input type="text" name="lat" id="lat"></div>
+                    <div><label for="lng">Longitude</label><input type="text" name="lng" id="lng"></div>
+                    <div><label for="lng">Json </label><span id="json"></span></span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mapCreate2">
+            <div class="row">
+                <div class="col-md-6">
+                    <div id="map2" style="height:500px;width:100%;"></div>
+                </div>
+                <div class="col-md-6">
+                    <button id="getLocationGps2">Try It</button>
+                    <div><label for="lat">kilometers</label><input type="text" name="kilometers" id="kilometers2" value="0.005"></div>
+                    <div><label for="lat">Latitude</label><input type="text" name="lat" id="lat2"></div>
+                    <div><label for="lng">Longitude</label><input type="text" name="lng" id="lng2"></div>
+                    <div><label for="lng">Json </label><span id="json2"></span></span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.4/leaflet.js"></script>
+    <script>
+
+    (function ( $ ) {
+        $.fn.mapCreate = function( options ) {
+            // This is the easiest way to have default options.
+            var settings = $.extend({
+                // These are the defaults.
+                enterprise: [23, 80],
+                zoom: 5,
+                range: 0.005,
+                map: 'map',
+            }, options );
+        
+            var map, pin, circles;
+            var tilesURL = 'https://www.google.com/maps/vt/lyrs=m&x={x}&y={y}&z={z}';
+            var mapAttrib = '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, Tiles courtesy of <a href="http://hot.openstreetmap.org/" target="_blank">Humanitarian OpenStreetMap Team</a>';
+
+            // create map instance
+            if (!(typeof map == "object")) {
+                map = L.map(settings.map, {
+                    center: settings.enterprise,
+                    zoom: settings.zoom
+                });
+            } else {
+                map.setZoom(settings.zoom).panTo(settings.enterprise);
+            }
+            // create the tile layer with correct attribution
+            L.tileLayer(tilesURL, {
+                attribution: mapAttrib,
+            }).addTo(map);
+
+            map.on('click', function (ev) {
+                latLngMapSet(ev.latlng);
+            });
+
+            function latLngMapSet(latlng) {
+                latLngSetData(latlng, true);
+                if (typeof pin == "object") {
+                    pin.setLatLng(latlng);
+                } else {
+                    pin = L.marker(latlng, { riseOnHover: true, draggable: true });
+                    pin.addTo(map);
+                    pin.on('drag', function (ev) {
+                        settings.enterprise=ev.target.getLatLng();
+                        setCircle();
+                    });
+                    pin.on('dragend', function (ev) {
+                        latLngSetData(ev.target.getLatLng());
+                    });
+                }
+            }
+
+            function setCircle(){
+                if(map.hasLayer(circles)){
+                    map.removeLayer(circles);
+                }
+                circles = L.circle([settings.enterprise.lat, settings.enterprise.lng], 1000*settings.range, {
+                    color: '#0000115c',
+                    fillColor: '#f4c96b',
+                    fillOpacity: 0.5
+                }).addTo(map);
+            }
+
+            function getLocation() {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(showPosition);
+                } else {
+                    x.innerHTML = "Geolocation is not supported by this browser.";
+                }
+            }
+            function showPosition(position) {
+                var latlng = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                };
+                latLngMapSet(latlng);
+            }
+
+            // latLngSetData
+            function latLngSetData(latlng, setZoom=false) {
+                settings.enterprise=latlng;
+                if (setZoom) {
+                    map.setZoom(13);
+                }
+                map.panTo([settings.enterprise.lat, settings.enterprise.lng]);
+                // setCircle
+                setCircle();
+
+                $(settings.input.lat).val(settings.enterprise.lat);
+                $(settings.input.lng).val(settings.enterprise.lng);
+                $.get("https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat="+settings.enterprise.lat+"&lon="+settings.enterprise.lng+"&addressdetails=1", function(data, status){
+                    $(settings.input.json).text(JSON.stringify(data));
+                    settings.success({
+                        "lat": settings.input.lat,
+                        "lng": settings.input.lng,
+                        "addressDetails": data,
+                    });
+                });
+            }
+
+            // On retransmit la valuer du input settings.range dana le input Number (et investment)
+            $(settings.input.kilometers).on('input', function() {
+                settings.range = $(this).val();
+                $(settings.input.kilometers).val(settings.range);
+                setCircle();
+            });
+            $(settings.input.getLocationGps).on('click', function() {
+                getLocation();
+            });
+
+        };
+    }( jQuery ));
+
+    $( ".mapCreate" ).mapCreate({
+        enterprise: [23, 80],
+        zoom: 5,
+        range: 0.005,
+        map: 'map',
+        input: {
+            lat: "#lat",
+            lng: "#lng",
+            json: "#json",
+            kilometers: "#kilometers",
+            getLocationGps: "#getLocationGps"
+        },
+        success: function(result){
+            console.log(result);
+        }
+    });
+    $( ".mapCreate2" ).mapCreate({
+        enterprise: [23, 80],
+        zoom: 5,
+        range: 0.005,
+        map: 'map2',
+        input: {
+            lat: "#lat2",
+            lng: "#lng2",
+            json: "#json2",
+            kilometers: "#kilometers2",
+            getLocationGps: "#getLocationGps2"
+        },
+        success: function(result){
+            console.log(result);
+        }
+    });
+    </script>
+</body>
+
+</html>
