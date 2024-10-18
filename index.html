@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -6,189 +5,202 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Map Integration</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.4/dist/leaflet.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.0/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+
+        .map-container {
+            margin-bottom: 40px;
+        }
+
+        .map-container h3 {
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            font-weight: 500;
+        }
+
+        #map, #map2 {
+            height: 500px;
+            width: 100%;
+            border-radius: 8px;
+            border: 2px solid #dee2e6;
+        }
+
+        .form-container {
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ced4da;
+        }
+
+        button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            border: none;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #json, #json2 {
+            display: block;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+    </style>
 </head>
 
 <body>
-    <div>
-        <div class="mapCreate">
+
+    <div class="container">
+        <!-- First Map Section -->
+        <div class="map-container">
+            <h3>Map 1</h3>
             <div class="row">
                 <div class="col-md-6">
-                    <div id="map" style="height:500px;width:100%;"></div>
+                    <div id="map"></div>
                 </div>
-                <div class="col-md-6">
-                    <button id="getLocationGps">Try It</button>
-                    <div><label for="lat">kilometers</label><input type="text" name="kilometers" id="kilometers" value="0.005"></div>
-                    <div><label for="lat">Latitude</label><input type="text" name="lat" id="lat"></div>
-                    <div><label for="lng">Longitude</label><input type="text" name="lng" id="lng"></div>
-                    <div><label for="lng">Json </label><span id="json"></span></span></div>
+                <div class="col-md-6 form-container">
+                    <button id="getLocationGps">Get Current Location</button>
+                    <div class="form-group">
+                        <label for="kilometers">Range (km)</label>
+                        <input type="text" name="kilometers" id="kilometers" value="0.005">
+                        <label for="kilometers_label" id="kilometers_label"></label>
+                    </div>
+                    <div class="form-group">
+                        <label for="lat">Latitude</label>
+                        <input type="text" name="lat" id="lat" value="28.62709253784589">
+                    </div>
+                    <div class="form-group">
+                        <label for="lng">Longitude</label>
+                        <input type="text" name="lng" id="lng" value="77.3731126179864">
+                    </div>
+                    <div class="form-group">
+                        <label for="json">Address Details</label>
+                        <span id="json"></span>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="mapCreate2">
+        <!-- Second Map Section -->
+        <div class="map-container">
+            <h3>Map 2</h3>
             <div class="row">
                 <div class="col-md-6">
-                    <div id="map2" style="height:500px;width:100%;"></div>
+                    <div id="map2"></div>
                 </div>
-                <div class="col-md-6">
-                    <button id="getLocationGps2">Try It</button>
-                    <div><label for="lat">kilometers</label><input type="text" name="kilometers" id="kilometers2" value="0.005"></div>
-                    <div><label for="lat">Latitude</label><input type="text" name="lat" id="lat2"></div>
-                    <div><label for="lng">Longitude</label><input type="text" name="lng" id="lng2"></div>
-                    <div><label for="lng">Json </label><span id="json2"></span></span></div>
+                <div class="col-md-6 form-container">
+                    <button id="getLocationGps2">Get Current Location</button>
+                    <div class="form-group">
+                        <label for="kilometers2">Range (km)</label>
+                        <input type="text" name="kilometers" id="kilometers2" value="0.005">
+                        <label for="kilometers_label2" id="kilometers_label2"></label>
+                    </div>
+                    <div class="form-group">
+                        <label for="lat2">Latitude</label>
+                        <input type="text" name="lat" id="lat2" value="28.62709253784589">
+                    </div>
+                    <div class="form-group">
+                        <label for="lng2">Longitude</label>
+                        <input type="text" name="lng" id="lng2" value="77.3731126179864">
+                    </div>
+                    <div class="form-group">
+                        <label for="json2">Address Details</label>
+                        <span id="json2"></span>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.4/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.0/js/bootstrap.min.js"></script>
+    <script src="js/mapPlugin.js"></script>
     <script>
+        $(document).ready(function() {
 
-    (function ( $ ) {
-        $.fn.mapCreate = function( options ) {
-            // This is the easiest way to have default options.
-            var settings = $.extend({
-                // These are the defaults.
+            // First map initialization
+            $(".user_address").mapCreate({
                 enterprise: [23, 80],
                 zoom: 5,
-                range: 0.005,
                 map: 'map',
-            }, options );
-        
-            var map, pin, circles;
-            var tilesURL = 'https://www.google.com/maps/vt/lyrs=m&x={x}&y={y}&z={z}';
-            var mapAttrib = '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, Tiles courtesy of <a href="http://hot.openstreetmap.org/" target="_blank">Humanitarian OpenStreetMap Team</a>';
-
-            // create map instance
-            if (!(typeof map == "object")) {
-                map = L.map(settings.map, {
-                    center: settings.enterprise,
-                    zoom: settings.zoom
-                });
-            } else {
-                map.setZoom(settings.zoom).panTo(settings.enterprise);
-            }
-            // create the tile layer with correct attribution
-            L.tileLayer(tilesURL, {
-                attribution: mapAttrib,
-            }).addTo(map);
-
-            map.on('click', function (ev) {
-                latLngMapSet(ev.latlng);
+                latLngValue: {
+                    range: getValue('#kilometers'),
+                    latitude: getValue('#lat'),
+                    longitude: getValue('#lng')
+                },
+                input: {
+                    getLocationGps: "#getLocationGps",
+                    lat: "#lat",
+                    lng: "#lng",
+                    kilometers: "#kilometers",
+                    kilometers_label: "#kilometers_label",
+                    json: "#json"
+                },
+                success: function(result){
+                    // Handle success here for Map 1
+                }
             });
 
-            function latLngMapSet(latlng) {
-                latLngSetData(latlng, true);
-                if (typeof pin == "object") {
-                    pin.setLatLng(latlng);
-                } else {
-                    pin = L.marker(latlng, { riseOnHover: true, draggable: true });
-                    pin.addTo(map);
-                    pin.on('drag', function (ev) {
-                        settings.enterprise=ev.target.getLatLng();
-                        setCircle();
-                    });
-                    pin.on('dragend', function (ev) {
-                        latLngSetData(ev.target.getLatLng());
-                    });
+            // Second map initialization
+            $(".user_address").mapCreate({
+                enterprise: [23, 80],
+                zoom: 5,
+                map: 'map2',
+                latLngValue: {
+                    range: getValue('#kilometers2'),
+                    latitude: getValue('#lat2'),
+                    longitude: getValue('#lng2')
+                },
+                input: {
+                    getLocationGps: "#getLocationGps2",
+                    lat: "#lat2",
+                    lng: "#lng2",
+                    kilometers: "#kilometers2",
+                    kilometers_label: "#kilometers_label2",
+                    json: "#json2"
+                },
+                success: function(result){
+                    // Handle success here for Map 2
                 }
-            }
-
-            function setCircle(){
-                if(map.hasLayer(circles)){
-                    map.removeLayer(circles);
-                }
-                circles = L.circle([settings.enterprise.lat, settings.enterprise.lng], 1000*settings.range, {
-                    color: '#0000115c',
-                    fillColor: '#f4c96b',
-                    fillOpacity: 0.5
-                }).addTo(map);
-            }
-
-            function getLocation() {
-                if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(showPosition);
-                } else {
-                    x.innerHTML = "Geolocation is not supported by this browser.";
-                }
-            }
-            function showPosition(position) {
-                var latlng = {
-                    lat: position.coords.latitude,
-                    lng: position.coords.longitude
-                };
-                latLngMapSet(latlng);
-            }
-
-            // latLngSetData
-            function latLngSetData(latlng, setZoom=false) {
-                settings.enterprise=latlng;
-                if (setZoom) {
-                    map.setZoom(13);
-                }
-                map.panTo([settings.enterprise.lat, settings.enterprise.lng]);
-                // setCircle
-                setCircle();
-
-                $(settings.input.lat).val(settings.enterprise.lat);
-                $(settings.input.lng).val(settings.enterprise.lng);
-                $.get("https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat="+settings.enterprise.lat+"&lon="+settings.enterprise.lng+"&addressdetails=1", function(data, status){
-                    $(settings.input.json).text(JSON.stringify(data));
-                    settings.success({
-                        "lat": settings.input.lat,
-                        "lng": settings.input.lng,
-                        "addressDetails": data,
-                    });
-                });
-            }
-
-            // On retransmit la valuer du input settings.range dana le input Number (et investment)
-            $(settings.input.kilometers).on('input', function() {
-                settings.range = $(this).val();
-                $(settings.input.kilometers).val(settings.range);
-                setCircle();
             });
-            $(settings.input.getLocationGps).on('click', function() {
-                getLocation();
-            });
+            
+            // Helper function to get input values
+            function getValue(selector) {
+                return $(selector).val();
+            }
 
-        };
-    }( jQuery ));
-
-    $( ".mapCreate" ).mapCreate({
-        enterprise: [23, 80],
-        zoom: 5,
-        range: 0.005,
-        map: 'map',
-        input: {
-            lat: "#lat",
-            lng: "#lng",
-            json: "#json",
-            kilometers: "#kilometers",
-            getLocationGps: "#getLocationGps"
-        },
-        success: function(result){
-            console.log(result);
-        }
-    });
-    $( ".mapCreate2" ).mapCreate({
-        enterprise: [23, 80],
-        zoom: 5,
-        range: 0.005,
-        map: 'map2',
-        input: {
-            lat: "#lat2",
-            lng: "#lng2",
-            json: "#json2",
-            kilometers: "#kilometers2",
-            getLocationGps: "#getLocationGps2"
-        },
-        success: function(result){
-            console.log(result);
-        }
-    });
+        });
     </script>
 </body>
 
